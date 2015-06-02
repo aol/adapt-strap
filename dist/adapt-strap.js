@@ -1,6 +1,6 @@
 /**
  * adapt-strap
- * @version v2.2.6 - 2015-05-27
+ * @version v2.2.6 - 2015-06-02
  * @link https://github.com/Adaptv/adapt-strap
  * @author Kashyap Patel (kashyap@adap.tv)
  * @license MIT License, http://www.opensource.org/licenses/MIT
@@ -198,14 +198,6 @@ angular.module('adaptv.adaptStrap.draggable', []).directive('adDrag', [
           element.on(startEvents, onPress);
           element.addClass('ad-draggable');
         }
-        if (!hasTouch) {
-          element.on('mousedown', '.ad-drag-handle', function () {
-            return false;
-          });
-          element.on('mousedown', function () {
-            return false;
-          });  // prevent native drag
-        }
       }
       //--- Event Handlers ---
       function onDragStart(evt, o) {
@@ -248,6 +240,7 @@ angular.module('adaptv.adaptStrap.draggable', []).directive('adDrag', [
           $document.on(endEvents, cancelPress);
         } else {
           onLongPress(evt);
+          return false;
         }
       }
       /*
@@ -325,12 +318,16 @@ angular.module('adaptv.adaptStrap.draggable', []).directive('adDrag', [
         cy = evt.pageY || evt.originalEvent.touches[0].pageY;
         tx = cx - mx + offset.left - $window.scrollLeft();
         ty = cy - my + offset.top - $window.scrollTop();
+        cx = cx - $window.scrollLeft();
+        cy = cy - $window.scrollTop();
         moveElement(tx, ty);
         $rootScope.$broadcast('draggable:move', {
           x: mx,
           y: my,
           tx: tx,
           ty: ty,
+          cx: cx,
+          cy: cy,
           el: element,
           data: scope.data
         });
@@ -467,7 +464,7 @@ angular.module('adaptv.adaptStrap.draggable', []).directive('adDrag', [
         if (element === obj.el) {
           return;
         }
-        var el = getCurrentDropElement(obj.tx, obj.ty, obj.el);
+        var el = getCurrentDropElement(obj.cx, obj.cy);
         if (el !== null) {
           elem = el;
           obj.el.lastDropElement = elem;
